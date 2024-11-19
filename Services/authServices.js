@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const User = require('./../Models/User'); // Assuming you have a User model
 const { sendOTP, verifyOTP } = require('./../utils/otpUtils'); // OTP-related logic
 require('dotenv').config(); // Load environment variables from .env file
+const {sendOTPToMail}  = require('./../utils/nodeMailer')
 
 
 
@@ -42,6 +43,8 @@ exports.forgotPassword = async ({ email }) => {
     if (!user) throw new Error('User not found.');
 
     const otp = sendOTP(email); // Utility to send OTP
+    const response = await sendOTPToMail(email, otp)
+    console.log('response from mail', response)
     user.otp = otp;
     user.otpExpiresAt = Date.now() + 10 * 60 * 1000; // OTP valid for 10 minutes
     await user.save();
