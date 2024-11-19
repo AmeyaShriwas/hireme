@@ -2,7 +2,9 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('./../Models/User'); // Assuming you have a User model
 require('dotenv').config(); // Load environment variables from .env file
-const {sendOTPToMail}  = require('./../utils/nodeMailer')
+const Transporter = require('./../utils/nodeMailer');
+const nodemailer = require("nodemailer");
+
 
 
 
@@ -13,6 +15,19 @@ const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
 // Helper function to generate a 6-digit OTP
 const generateOTP = () => {
     return Math.floor(100000 + Math.random() * 900000); // Generates a 6-digit number
+  };
+
+
+  // Send OTP Email
+const sendOtpEmail = async(email, otp) => {
+    
+    const mailOption = {
+      from: process.env.EMAIL,
+      to: email,
+      subject: 'Your One Time Password (OTP) Code',
+      text: `Dear User, Your One-Time-Password (OTP) code for account verification is: ${otp}\n\nThis OTP is valid for the next 5 minutes. Please use it to complete the verification process.\n\nIf you didn't request this OTP, please ignore this email.\n\nBest regards,\nAmeya Shriwas`
+    };
+    await Transporter.sendMail(mailOption);
   };
 
 exports.signup = async ({ userName, email, password, role }) => {
@@ -55,7 +70,7 @@ exports.forgotPassword = async ({ email }) => {
     const otp = generateOTP(); // Define or use a function to generate OTP
     
     // Step 3: Send the OTP to the user's email
-    const response = await sendOTPToMail(user.email, otp);
+    const response = await sendOtpEmail(user.email, otp);;
     console.log('Response from mail:', response);
     
     // If the email send failed, throw an error
