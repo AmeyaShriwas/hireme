@@ -1,7 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('./../Models/User'); // Assuming you have a User model
-const { sendOTP, verifyOTP } = require('./../utils/otpUtils'); // OTP-related logic
 require('dotenv').config(); // Load environment variables from .env file
 const {sendOTPToMail}  = require('./../utils/nodeMailer')
 
