@@ -56,7 +56,7 @@ exports.forgotPassword = async ({ email }) => {
     const otp = generateOTP(); // Define or use a function to generate OTP
     
     // Step 3: Send the OTP to the user's email
-    const response = await sendOTPToMail(email, otp);
+    const response = await sendOTPToMail(user.email, otp);
     console.log('Response from mail:', response);
     
     // If the email send failed, throw an error
