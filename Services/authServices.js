@@ -3,7 +3,6 @@ const jwt = require('jsonwebtoken');
 const User = require('./../Models/User'); // Assuming you have a User model
 require('dotenv').config(); // Load environment variables from .env file
 const Transporter = require('./../utils/nodeMailer');
-const nodemailer = require("nodemailer");
 
 
 
@@ -25,7 +24,7 @@ const sendOtpEmail = async(email, otp) => {
       from: process.env.EMAIL,
       to: email,
       subject: 'Your One Time Password (OTP) Code',
-      text: `Dear User, Your One-Time-Password (OTP) code for account verification is: ${otp}\n\nThis OTP is valid for the next 5 minutes. Please use it to complete the verification process.\n\nIf you didn't request this OTP, please ignore this email.\n\nBest regards,\nAmeya Shriwas`
+      text: `Dear User, Your One-Time-Password (OTP) code for account verification is: ${otp}\n\nThis OTP is valid for the next 5 minutes. Please use it to complete the verification process.\n\nIf you didn't request this OTP, please ignore this email.\n\nBest regards,\nHire me`
     };
     await Transporter.sendMail(mailOption);
   };
@@ -68,7 +67,8 @@ exports.forgotPassword = async ({ email }) => {
   
     // Step 2: Generate OTP (Use a helper function for this)
     const otp = generateOTP(); // Define or use a function to generate OTP
-    
+    console.log('user email', user.email)
+    console.log('otp', otp)
     // Step 3: Send the OTP to the user's email
     const response = await sendOtpEmail(user.email, otp);;
     console.log('Response from mail:', response);
