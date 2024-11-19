@@ -11,6 +11,11 @@ const {sendOTPToMail}  = require('./../utils/nodeMailer')
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
 
+// Helper function to generate a 6-digit OTP
+const generateOTP = () => {
+    return Math.floor(100000 + Math.random() * 900000); // Generates a 6-digit number
+  };
+
 exports.signup = async ({ userName, email, password, role }) => {
     const existingUser = await User.findOne({ email });
     if (existingUser) throw new Error('Email is already registered.');
@@ -39,18 +44,34 @@ exports.login = async ({ email, password }) => {
 };
 
 exports.forgotPassword = async ({ email }) => {
+    // Step 1: Find the user by email
     const user = await User.findOne({ email });
-    if (!user) throw new Error('User not found.');
-
-    const otp = sendOTP(email); // Utility to send OTP
-    const response = await sendOTPToMail(email, otp)
-    console.log('response from mail', response)
+    
+    // If user not found, throw an error
+    if (!user) {
+      throw new Error('User not found.');
+    }
+  
+    // Step 2: Generate OTP (Use a helper function for this)
+    const otp = generateOTP(); // Define or use a function to generate OTP
+    
+    // Step 3: Send the OTP to the user's email
+    const response = await sendOTPToMail(email, otp);
+    console.log('Response from mail:', response);
+    
+    // If the email send failed, throw an error
+    if (!response) {
+      throw new Error('Failed to send OTP email.');
+    }
+  
+    // Step 4: Save OTP and expiration time in the user's record
     user.otp = otp;
-    user.otpExpiresAt = Date.now() + 10 * 60 * 1000; // OTP valid for 10 minutes
+    user.otpExpiresAt = Date.now() + 10 * 60 * 1000; // OTP expires in 10 minutes
     await user.save();
-
+  
+    // Return success message
     return 'OTP sent to your email.';
-};
+  };
 
 exports.verifyOTP = async ({ email, otp }) => {
     const user = await User.findOne({ email });
