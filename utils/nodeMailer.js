@@ -9,7 +9,9 @@ const PASSWORD = process.env.PASSWORD;
 
 // Create a transporter object using the environment variables
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+    host: process.env.EMAIL_HOST,
+    port: process.env.EMAIL_PORT,
+    secure: true,
   auth: {
     user: process.env.EMAIL,
     pass: process.env.PASSWORD,
