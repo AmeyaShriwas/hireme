@@ -62,6 +62,7 @@ exports.forgotPassword = async ({ email }) => {
     if (!response) {
       throw new Error('Failed to send OTP email.');
     }
+    console.log('response', response)
   
     // Step 4: Save OTP and expiration time in the user's record
     user.otp = otp;
