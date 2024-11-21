@@ -21,10 +21,10 @@ const generateOTP = () => {
 const sendOtpEmail = async(email, otp) => {
     
     const mailOption = {
-      from: process.env.EMAIL,
+      from: process.env.EMAIL_USER,
       to: email,
       subject: 'Your One Time Password (OTP) Code',
-      text: `Dear User, Your One-Time-Password (OTP) code for account verification is: ${otp}\n\nThis OTP is valid for the next 5 minutes. Please use it to complete the verification process.\n\nIf you didn't request this OTP, please ignore this email.\n\nBest regards,\nHire me`
+      text: `Dear User, Your One-Time-Password (OTP) code for account verification is: ${otp}\n\nThis OTP is valid for the next 5 minutes. Please use it to complete the verification process.\n\nIf you didn't request this OTP, please ignore this email.\n\nBest regards,\nAmeya Shriwas`
     };
     await Transporter.sendMail(mailOption);
   };
@@ -67,18 +67,10 @@ exports.forgotPassword = async ({ email }) => {
   
     // Step 2: Generate OTP (Use a helper function for this)
     const otp = generateOTP(); // Define or use a function to generate OTP
-    console.log('user email', user.email)
-    console.log('otp', otp)
+    console.log('email get', user.email)
     // Step 3: Send the OTP to the user's email
-    const response = await sendOtpEmail(user.email, otp);;
-    console.log('Response from mail:', response);
-    
-    // If the email send failed, throw an error
-    if (!response) {
-      throw new Error('Failed to send OTP email.');
-    }
-    console.log('response', response)
-  
+   await sendOtpEmail(user.email, otp);
+   
     // Step 4: Save OTP and expiration time in the user's record
     user.otp = otp;
     user.otpExpiresAt = Date.now() + 10 * 60 * 1000; // OTP expires in 10 minutes
