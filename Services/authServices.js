@@ -73,20 +73,19 @@ exports.forgotPassword = async ({ email }) => {
     // Step 3: Send the OTP to the user's email
     try {
       await sendOtpEmail(user.email, otp);
-      console.log(`OTP successfully sent to ${email}`);
+        // Step 4: Save OTP and expiration time in the user's record
+    user.otp = otp;
+    user.otpExpiresAt = Date.now() + 10 * 60 * 1000; // OTP expires in 10 minutes
+    await user.save();
+    console.log(`OTP saved to user record for ${email}.`);
+     return 'otp send to email successfully'
     } catch (error) {
       console.error(`Failed to send OTP to ${email}:`, error.message);
       throw new Error('Failed to send OTP. Please try again later.');
     }
 
-    // Step 4: Save OTP and expiration time in the user's record
-    user.otp = otp;
-    user.otpExpiresAt = Date.now() + 10 * 60 * 1000; // OTP expires in 10 minutes
-    await user.save();
-    console.log(`OTP saved to user record for ${email}.`);
+  
 
-    // Return success message
-    return 'OTP sent to your email.';
   } catch (error) {
     console.error(`Error in forgotPassword: ${error.message}`);
     throw error;
