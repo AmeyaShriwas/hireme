@@ -57,28 +57,42 @@ exports.login = async ({ email, password }) => {
 };
 
 exports.forgotPassword = async ({ email }) => {
+  try {
     // Step 1: Find the user by email
     const user = await User.findOne({ email });
-    
-    // If user not found, throw an error
+
     if (!user) {
+      console.error(`User with email ${email} not found.`);
       throw new Error('User not found.');
     }
-  
-    // Step 2: Generate OTP (Use a helper function for this)
-    const otp = generateOTP(); // Define or use a function to generate OTP
-    console.log('email get', user.email)
+
+    // Step 2: Generate OTP
+    const otp = generateOTP(); // Ensure this function exists and is implemented properly
+    console.log(`Generated OTP for ${email}: ${otp}`);
+
     // Step 3: Send the OTP to the user's email
-   await sendOtpEmail(user.email, otp);
-   
+    try {
+      await sendOtpEmail(user.email, otp);
+      console.log(`OTP successfully sent to ${email}`);
+    } catch (error) {
+      console.error(`Failed to send OTP to ${email}:`, error.message);
+      throw new Error('Failed to send OTP. Please try again later.');
+    }
+
     // Step 4: Save OTP and expiration time in the user's record
     user.otp = otp;
     user.otpExpiresAt = Date.now() + 10 * 60 * 1000; // OTP expires in 10 minutes
     await user.save();
-  
+    console.log(`OTP saved to user record for ${email}.`);
+
     // Return success message
     return 'OTP sent to your email.';
-  };
+  } catch (error) {
+    console.error(`Error in forgotPassword: ${error.message}`);
+    throw error;
+  }
+};
+
 
 exports.verifyOTP = async ({ email, otp }) => {
     const user = await User.findOne({ email });
